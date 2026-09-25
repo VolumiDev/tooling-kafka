@@ -15,8 +15,8 @@ Las imágenes se pueden cambiar (p. ej. registro interno de la empresa):
 ```yaml
 # kafka-testkit.yml
 testcontainers:
-  kafkaImage: registry.acme.com/mirror/apache/kafka:4.1.0
-  schemaRegistryImage: registry.acme.com/mirror/confluentinc/cp-schema-registry:8.0.0
+  kafkaImage: registry.acme.com/mirror/apache/kafka:4.3.1
+  schemaRegistryImage: registry.acme.com/mirror/confluentinc/cp-schema-registry:8.3.2
   reuse: true                       # Testcontainers reuse (requiere testcontainers.reuse.enable=true)
   autoCreateTopics: true            # crea los topics del YAML con su 'definition'
   clusters: [ main, legacy ]        # clusters lógicos que se redirigen al contenedor
@@ -52,7 +52,7 @@ EmbeddedKafkaOptions.defaults()
         .clusters("main", "legacy")
         .withSchemaRegistry(true)
         .autoCreateTopics(true)
-        .kafkaImage("apache/kafka:4.1.0")
+        .kafkaImage("apache/kafka:4.3.1")
         .brokerProperty("auto.create.topics.enable", "false")
         .security(EmbeddedSecurity.saslScram("admin", "admin-secret"));   // opcional
 ```
@@ -70,7 +70,7 @@ KafkaTestKit.builder()
         .build();
 ```
 
-## 3. Extensión JUnit 5
+## 3. Extensión JUnit (Jupiter)
 
 ```java
 @KafkaTestKitContainers(clusters = {"main"}, schemaRegistry = true)

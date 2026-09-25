@@ -15,6 +15,7 @@ Librería Java 21 (Maven multi-módulo) para **testing** sobre Kafka: producir y
 
 ## Módulos
 core · schema-registry · karate · testcontainers · bom · it (no se publica). Core NO depende de Confluent, Karate ni Testcontainers.
+Stack: Java 21, kafka-clients 4.3, Karate 2 (`io.karatelabs`), JUnit 6, Testcontainers 2. Versiones en `pom.xml`.
 
 ## Reglas de código
 - Paquete raíz `io.github.volumidev.kafkatestkit` (provisional). La API pública va fuera de `internal`; la implementación, en `internal.*`.
@@ -23,7 +24,7 @@ core · schema-registry · karate · testcontainers · bom · it (no se publica)
 - Solo `slf4j-api` para logs. Nunca registrar secretos (usar `Secret` y `PropertiesMasker`).
 - Excepciones unchecked de `exception/`. Las esperas fallidas extienden `AssertionError`.
 - Lectura por defecto con `assign()` + `seek()`, sin `group.id`.
-- Los filtros se evalúan en el hilo que llama al await (requisito de GraalJS en Karate).
+- Los filtros se evalúan en el hilo que llama al await (requisito de GraalJS en Karate 1.x; se mantiene hasta verificarlo con `karate-js` de Karate 2 en F8).
 - Javadoc en toda la API pública. Formato google-java-format (Spotless).
 
 ## Tests

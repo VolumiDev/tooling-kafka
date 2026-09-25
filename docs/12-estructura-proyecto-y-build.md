@@ -6,7 +6,7 @@
 kafka-testkit/
 ├── pom.xml                                   # padre: versiones, plugins, módulos
 ├── README.md
-├── LICENSE                                   # Apache-2.0 (propuesta)
+├── LICENSE                                   # Apache-2.0
 ├── CHANGELOG.md
 ├── .github/workflows/
 │   ├── build.yml                             # verify en cada push/PR
@@ -14,6 +14,7 @@ kafka-testkit/
 ├── .mvn/wrapper/ + mvnw, mvnw.cmd            # Maven Wrapper
 ├── config/
 │   ├── checkstyle.xml
+│   ├── license-header.txt                    # cabecera Apache-2.0 que aplica Spotless
 │   └── spotbugs-exclude.xml
 ├── docs/                                     # esta documentación
 ├── kafka-testkit-bom/pom.xml
@@ -21,7 +22,7 @@ kafka-testkit/
 │   ├── pom.xml
 │   └── src/
 │       ├── main/java/io/github/volumidev/kafkatestkit/...
-│       ├── main/java/module-info.java
+│       ├── main/resources/io/github/volumidev/kafkatestkit/version.properties   # filtrado: versión del artefacto
 │       ├── main/resources/META-INF/services/io.github.volumidev.kafkatestkit.serde.SerdeProvider
 │       └── test/java/...                     # unitarios
 ├── kafka-testkit-schema-registry/
@@ -42,6 +43,7 @@ kafka-testkit/
 ```
 io.github.volumidev.kafkatestkit
 ├── KafkaTestKit                 interfaz principal + factorías load()
+├── KafkaTestKitVersion          versión en ejecución (F1)
 ├── KafkaTestKitBuilder
 ├── ClusterClient
 ├── TopicClient
@@ -95,7 +97,7 @@ Módulo Testcontainers: `io.github.volumidev.kafkatestkit.testcontainers` (`Embe
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.volumidev</groupId>
   <artifactId>kafka-testkit-parent</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>${revision}</version>                <!-- revision=0.1.0-SNAPSHOT; flatten lo resuelve -->
   <packaging>pom</packaging>
 
   <modules>
@@ -111,15 +113,15 @@ Módulo Testcontainers: `io.github.volumidev.kafkatestkit.testcontainers` (`Embe
     <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <kafka.version>4.1.0</kafka.version>
-    <confluent.version>8.0.0</confluent.version>
-    <jackson.version>2.19.0</jackson.version>
-    <jsonpath.version>2.9.0</jsonpath.version>
-    <slf4j.version>2.0.17</slf4j.version>
-    <karate.version>1.5.1</karate.version>
-    <testcontainers.version>1.21.0</testcontainers.version>
-    <junit.version>5.12.2</junit.version>
-    <assertj.version>3.27.3</assertj.version>
+    <kafka.version>4.3.1</kafka.version>
+    <confluent.version>8.3.2</confluent.version>   <!-- CP 8.3 ↔ AK 4.3 -->
+    <jackson.version>2.22.3</jackson.version>
+    <jsonpath.version>3.0.0</jsonpath.version>
+    <slf4j.version>2.0.20</slf4j.version>
+    <karate.version>2.1.2</karate.version>          <!-- io.karatelabs, karate-junit6 -->
+    <testcontainers.version>2.0.5</testcontainers.version>
+    <junit.version>6.1.3</junit.version>
+    <assertj.version>3.27.7</assertj.version>
   </properties>
 
   <repositories>
@@ -154,13 +156,15 @@ Módulo Testcontainers: `io.github.volumidev.kafkatestkit.testcontainers` (`Embe
         <artifactId>kafka-clients</artifactId>
         <version>${kafka.version}</version>
       </dependency>
-      <!-- confluent, json-path, slf4j, karate, assertj ... -->
+      <!-- módulos propios, json-path, slf4j, karate, assertj ... (confluent en F7) -->
     </dependencies>
   </dependencyManagement>
 </project>
 ```
 
-> Las versiones son orientativas; se fijarán a las últimas estables al crear el esqueleto (fase 1 del roadmap), comprobando que `kafka-clients` y Confluent son compatibles entre sí.
+> Versiones fijadas en F1 (septiembre 2026) a las últimas estables; `pom.xml` es la fuente de verdad. El BOM (`kafka-testkit-bom`) no hereda del padre para no publicar versiones de terceros, y el padre no lo importa (un BOM del mismo reactor no se puede importar): declara los módulos en su propio `dependencyManagement`.
+>
+> Plugins (F1): compiler 3.15.0, surefire/failsafe 3.6.0, enforcer 3.6.3, spotless 3.10.2 (google-java-format 1.36.1), checkstyle plugin 3.6.0 (Checkstyle 14.1.0), spotbugs 4.10.4.1, jacoco 0.8.15, javadoc 3.12.0, source 3.4.0, jar 3.5.1, flatten 1.8.0. Maven Wrapper con Maven 3.9.16.
 
 ## 4. Plugins de build y calidad
 
@@ -168,26 +172,26 @@ Módulo Testcontainers: `io.github.volumidev.kafkatestkit.testcontainers` (`Embe
 |--------|------|-----------|
 | `maven-enforcer-plugin` | validate | Java ≥ 21, Maven ≥ 3.9, sin dependencias duplicadas/convergencia |
 | `spotless-maven-plugin` | validate (`check`) | Formato `google-java-format` (AOSP) + licencia en cabecera |
-| `maven-compiler-plugin` | compile | `release 21`, `-Xlint:all -Werror` |
+| `maven-compiler-plugin` | compile | `release 21`, `-Xlint:all,-processing -Werror` |
 | `maven-surefire-plugin` | test | Tests unitarios (`*Test`) |
 | `maven-failsafe-plugin` | integration-test/verify | Tests de integración (`*IT`), solo en `kafka-testkit-it` |
-| `jacoco-maven-plugin` | verify | Cobertura; umbral 80 % líneas en core |
+| `jacoco-maven-plugin` | verify | Cobertura; umbral 80 % líneas en core (propiedad `jacoco.minimum.coverage`, 0 en el resto) |
 | `maven-checkstyle-plugin` | verify | Reglas de estilo/diseño |
 | `spotbugs-maven-plugin` | verify | Análisis estático |
-| `maven-javadoc-plugin` | package | Javadoc de API pública (`-Xdoclint:all` excepto `missing` en internal) |
+| `maven-javadoc-plugin` | package | Javadoc de API pública (`doclint all,-missing`, `failOnWarnings`; la falta de Javadoc la vigila Checkstyle fuera de `internal`). Se omite en módulos aún sin clases públicas |
 | `maven-source-plugin` | package | Jar de fuentes |
 | `flatten-maven-plugin` | process-resources | POMs publicados limpios (`${revision}` CI-friendly) |
 | `maven-gpg-plugin` + `central-publishing-maven-plugin` | deploy (perfil `release`) | Publicación en Maven Central |
-| `license-maven-plugin` | verify | Informe de licencias de dependencias |
+| `license-maven-plugin` | verify | Informe de licencias de dependencias (**pendiente, F10**) |
 
 Perfiles:
 
 | Perfil | Uso |
 |--------|-----|
-| (defecto) | Compila y pasa tests unitarios; ITs se omiten si no hay Docker (`@Testcontainers(disabledWithoutDocker = true)`) |
-| `it` | Fuerza tests de integración |
-| `release` | Firma y publica |
-| `corporate` | `distributionManagement` a Nexus/Artifactory corporativo (URL por propiedad) |
+| (defecto) | Compila y pasa tests unitarios; en `kafka-testkit-it` `skipITs=true` |
+| `it` | `skipITs=false`: ejecuta los `*IT` con failsafe (requieren Docker a partir de F3) |
+| `release` | Firma y publica (**pendiente, F10**) |
+| `corporate` | `distributionManagement` a Nexus/Artifactory corporativo, URL por propiedad (**pendiente, F10**) |
 
 ## 5. CI (GitHub Actions)
 

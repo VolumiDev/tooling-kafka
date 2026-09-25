@@ -37,8 +37,8 @@ graph TD
 | `kafka-testkit-core` | — | `kafka-clients`, `jackson-databind`, `jackson-dataformat-yaml`, `jackson-datatype-jsr310`, `json-path`, `slf4j-api` |
 | `kafka-testkit-schema-registry` | core | `kafka-avro-serializer`, `kafka-protobuf-serializer`, `kafka-json-schema-serializer`, `kafka-schema-registry-client` (Confluent) |
 | `kafka-testkit-karate` | core | `karate-core` (scope `provided`: lo trae el proyecto usuario) |
-| `kafka-testkit-testcontainers` | core | `org.testcontainers:kafka`, `junit-jupiter-api` (`provided`, para la extensión) |
-| `kafka-testkit-it` | todos | `karate-junit5`, `junit-jupiter`, `assertj`, `logback-classic` |
+| `kafka-testkit-testcontainers` | core | `org.testcontainers:testcontainers-kafka` (Testcontainers 2.x), `junit-jupiter-api` (`provided`, para la extensión) |
+| `kafka-testkit-it` | todos | `karate-junit6`, `junit-jupiter` (JUnit 6), `testcontainers-junit-jupiter`, `assertj`, `slf4j-simple` |
 
 Un usuario de Karate con Avro añadiría:
 
@@ -273,4 +273,4 @@ Los hilos de captura son **virtual threads** (Java 21) con nombre `kafka-testkit
 
 - Paquetes públicos: `io.github.volumidev.kafkatestkit`, `.config`, `.message`, `.capture`, `.admin`, `.serde`, `.exception`.
 - Paquete `io.github.volumidev.kafkatestkit.internal.*`: implementación, sin garantías de compatibilidad.
-- Se publica `module-info.java` (JPMS) exportando solo los paquetes públicos; funciona igualmente en classpath.
+- **Sin `module-info.java` por ahora.** `kafka-clients` (4.3.x) no declara nombre de módulo (ni `module-info` ni `Automatic-Module-Name`), así que un `requires kafka.clients` dependería del nombre del fichero `.jar` (Maven avisa de no publicar así). Core declara `Automatic-Module-Name: io.github.volumidev.kafkatestkit` en el manifiesto para reservar el nombre; se añadirá `module-info.java` cuando Kafka publique uno. La separación pública/`internal` se mantiene por convención y Checkstyle.
