@@ -1,0 +1,17 @@
+# Maven
+target/
+.flattened-pom.xml
+dependency-reduced-pom.xml
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+
+# SO
+.DS_Store
+Thumbs.db
