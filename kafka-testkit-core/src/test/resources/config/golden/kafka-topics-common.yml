@@ -1,0 +1,6 @@
+topics:
+  heartbeat:
+    cluster: main
+    name: ${ENV_PREFIX:dev}.heartbeat.v1
+    key: { format: STRING }
+    value: { format: STRING }
