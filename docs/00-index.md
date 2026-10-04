@@ -40,4 +40,4 @@ Este directorio recoge el diseño completo de la librería antes de empezar la i
 | Lectura | `assign()` + `seek()` sin consumer group por defecto |
 | Esperas | `MessageCapture` en segundo plano iniciada antes de la acción |
 | Integración | Núcleo Java puro + adaptador Karate |
-| Tests de la librería | JUnit 5 + Testcontainers + suite Karate |
+| Tests de la librería | JUnit 6 + Testcontainers 2 + suite Karate 2 |

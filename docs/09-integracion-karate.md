@@ -8,7 +8,9 @@
 - Aceptar timeouts como `'20s'`, `'500ms'` o número de milisegundos.
 - Ser seguro con la ejecución **en paralelo** de Karate (`Runner.parallel(n)`).
 
-Compatibilidad objetivo: Karate 1.4+ (Java 17+; la librería requiere Java 21).
+Compatibilidad objetivo: **Karate 2.1+** (`io.karatelabs:karate-core`, runner `karate-junit6`; la librería requiere Java 21).
+
+> **Pendiente de revisar en F8**: el diseño de este documento se escribió para Karate 1.x. Karate 2 cambia el motor JS (`karate-js` propio en lugar de GraalJS), los paquetes (`io.karatelabs.*` en lugar de `com.intuit.karate.*`) y usa JUnit 6. Antes de implementar F8 hay que verificar la API de `Match`, el paso de funciones JS a Java y las restricciones de hilos, y actualizar este documento.
 
 ## 2. Dependencias
 
@@ -141,7 +143,7 @@ La función recibe el mensaje en forma de Map:
 * def msg = cap.awaitOne(isBig, '20s')
 ```
 
-> **Nota técnica**: el motor JS de Karate (GraalJS) no permite ejecutar una función desde otro hilo. Por eso **los filtros se evalúan siempre en el hilo del test** (el que llama a `awaitOne`), nunca en el worker de la captura. El worker solo llena el buffer; `await*` recorre el buffer en el hilo llamante cada vez que recibe una señal. Por la misma razón `capture(topic, { filter })` solo acepta filtros JSON, no funciones.
+> **Nota técnica** (Karate 1.x; se mantiene como regla hasta verificar `karate-js` en F8): el motor JS de Karate (GraalJS) no permite ejecutar una función desde otro hilo. Por eso **los filtros se evalúan siempre en el hilo del test** (el que llama a `awaitOne`), nunca en el worker de la captura. El worker solo llena el buffer; `await*` recorre el buffer en el hilo llamante cada vez que recibe una señal. Por la misma razón `capture(topic, { filter })` solo acepta filtros JSON, no funciones.
 
 ### 5.3 Usar `match` de Karate como filtro
 

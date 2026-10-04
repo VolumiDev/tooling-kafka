@@ -26,7 +26,9 @@ gantt
 
 ---
 
-## F1 · Esqueleto del proyecto
+## F1 · Esqueleto del proyecto ✅
+> **Hecha** (rama `feat/f1-esqueleto`). Cambios frente al plan: sin `module-info.java` (kafka-clients no declara nombre de módulo; se usa `Automatic-Module-Name`, ver [02 §9](02-arquitectura.md#9-api-pública-vs-interna)); Karate 2.1.2 + JUnit 6 en lugar de Karate 1.5 + JUnit 5; `license-maven-plugin` y perfiles `release`/`corporate` pasan a F10.
+
 **Entregables**
 - POM padre, BOM y los cinco módulos vacíos + `kafka-testkit-it`.
 - Maven Wrapper, enforcer, spotless, checkstyle, spotbugs, jacoco, surefire/failsafe.
@@ -67,7 +69,7 @@ gantt
 ## F4 · Testcontainers básico
 **Entregables**
 - `EmbeddedKafka` (Kafka KRaft, sin SR aún), overrides, `autoCreateTopics`.
-- Extensión JUnit 5 `@KafkaTestKitContainers` / `@InjectKafkaTestKit`.
+- Extensión JUnit (Jupiter) `@KafkaTestKitContainers` / `@InjectKafkaTestKit`.
 - `EmbeddedKafka.shared()`.
 
 **Criterios de aceptación**
@@ -131,7 +133,7 @@ gantt
 - Revisión de API pública, Javadoc completo, `japicmp` activado.
 - `KitStats`, detección de capturas no cerradas.
 - README definitivo, guía de migración desde utilidades ad-hoc, ejemplos en `examples/`.
-- Perfil `release` y publicación (Maven Central y/o repositorio corporativo).
+- Perfiles `release` y `corporate`, `license-maven-plugin` y publicación (Maven Central y/o repositorio corporativo).
 
 **Criterios de aceptación**
 - Umbrales de calidad de [13 §6](13-estrategia-de-testing.md#6-criterios-de-calidad).
@@ -160,4 +162,4 @@ gantt
 2. Versiones concretas de Kafka/Confluent de los clusters de la empresa, para fijar las de los serializers y las imágenes de Testcontainers.
 3. ¿Hay convención de headers corporativos (traceId, eventType…) que merezca soporte específico (p. ej. filtros o defaults)?
 4. ¿Se usan estrategias de subject distintas de `TopicNameStrategy`?
-5. ¿Hace falta soporte para Karate 2.x si se adopta durante el desarrollo?
+5. ~~¿Hace falta soporte para Karate 2.x?~~ **Resuelta en F1**: se usa Karate 2.1.2 (`karate-js`, `karate-junit6`). Revisar [09](09-integracion-karate.md) antes de F8.

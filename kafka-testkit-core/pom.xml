@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.github.volumidev</groupId>
+    <artifactId>kafka-testkit-parent</artifactId>
+    <version>${revision}</version>
+  </parent>
+
+  <artifactId>kafka-testkit-core</artifactId>
+
+  <name>kafka-testkit :: Core</name>
+  <description>API y motor de kafka-testkit: configuración YAML, producción, lectura, capturas y admin.</description>
+
+  <properties>
+    <jacoco.minimum.coverage>0.80</jacoco.minimum.coverage>
+  </properties>
+
+  <build>
+    <plugins>
+      <!--
+        Sin module-info: kafka-clients no declara nombre de módulo (ni module-info ni
+        Automatic-Module-Name), y exigirlo por nombre de fichero es frágil. Ver docs/02 §9.
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Automatic-Module-Name>io.github.volumidev.kafkatestkit</Automatic-Module-Name>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/version.properties</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/version.properties</exclude>
+        </excludes>
+      </resource>
+    </resources>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka-clients</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+  </dependencies>
+</project>
