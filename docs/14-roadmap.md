@@ -40,7 +40,18 @@ gantt
 - `./mvnw verify` pasa en local (Windows) y en CI (Linux).
 - Un test trivial por módulo se ejecuta.
 
-## F2 · Configuración
+## F2 · Configuración ✅
+> **Hecha** (rama `feat/f2-configuracion`). Cambios frente al plan: el motor de merge de
+> `environments.<entorno>` (`EnvironmentMerger` en el diseño) se implementó como `TreeMerger`, un
+> único motor reutilizado también para combinar `include`/varios ficheros — incluida la regla de
+> reemplazo completo de `security` al cambiar `protocol`, que así aplica en ambos casos. `load(...)`
+> no copia `classpath:` a fichero temporal ni aplica `System.setProperty` para `krb5Conf`:
+> `ResourceLoader` solo valida existencia/lee contenido; la materialización real se añadirá en F3+
+> cuando se construya un cliente de verdad (`SecurityPropertiesMapper` ya genera las propiedades
+> completas y se testea en F2, pero no se invoca desde `load()`). La validación de "módulo de
+> serdes ausente" (AVRO/PROTOBUF/JSON_SCHEMA sin `kafka-testkit-schema-registry`) se deja para F7,
+> cuando exista el SPI de serdes que permite detectarlo con sentido.
+
 **Entregables**
 - Records de configuración ([02 §4](02-arquitectura.md#4-modelo-de-dominio-de-configuración)).
 - `YamlConfigLoader` (classpath/fichero, `include`, varios ficheros).

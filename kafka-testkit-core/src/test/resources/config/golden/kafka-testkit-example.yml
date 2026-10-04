@@ -1,0 +1,78 @@
+include:
+  - classpath:config/golden/kafka-topics-common.yml
+
+defaults:
+  timeouts: { await: 30s, poll: 200ms, request: 15s }
+  producer:
+    properties: { acks: all, enable.idempotence: true }
+  consumer:
+    properties: { isolation.level: read_committed }
+
+clusters:
+  main:
+    bootstrapServers: ${KAFKA_MAIN_BOOTSTRAP}
+    clientIdPrefix: qa-${USER:ci}
+    security:
+      protocol: SASL_SSL
+      sasl:
+        mechanism: SCRAM-SHA-512
+        username: ${KAFKA_USER}
+        password: ${KAFKA_PASSWORD}
+      ssl:
+        truststore: { location: "classpath:certs/truststore.jks", password: "${TS_PASS}", type: JKS }
+    schemaRegistry:
+      url: ${SR_URL:https://sr.test}
+      auth: { type: BASIC, username: "${SR_USER}", password: "${SR_PASSWORD}" }
+    admin:
+      allowDestructive: false
+      protectedTopics: [ "^prod\\..*" ]
+
+  legacy:
+    bootstrapServers: legacy-kafka.acme.com:9094
+    security:
+      protocol: SSL
+      ssl:
+        truststore: { location: "classpath:certs/legacy-ca.p12", password: "${LEGACY_TS_PASS}", type: PKCS12 }
+        keystore:   { location: "classpath:certs/qa-client.p12", password: "${LEGACY_KS_PASS}", type: PKCS12 }
+
+topics:
+  orders:
+    cluster: main
+    name: ${ENV_PREFIX:dev}.orders.v1
+    key:   { format: STRING }
+    value: { format: AVRO }
+  payments:
+    cluster: main
+    name: ${ENV_PREFIX:dev}.payments.v1
+    key:   { format: STRING }
+    value: { format: PROTOBUF, messageType: com.acme.payments.PaymentEvent }
+  customers:
+    cluster: main
+    name: ${ENV_PREFIX:dev}.customers.v1
+    value: { format: JSON_SCHEMA }
+  audit:
+    cluster: legacy
+    name: audit-log
+    key:   { format: BYTES }
+    value: { format: JSON }
+  counters:
+    cluster: legacy
+    name: counters
+    key:   { format: STRING }
+    value: { format: LONG }
+
+environments:
+  local:
+    clusters:
+      main:
+        bootstrapServers: localhost:9092
+        security: { protocol: PLAINTEXT }
+        schemaRegistry: { url: "http://localhost:8081", auth: { type: NONE } }
+        admin: { allowDestructive: true }
+      legacy:
+        bootstrapServers: localhost:9092
+        security: { protocol: PLAINTEXT }
+  pre:
+    clusters:
+      main:
+        bootstrapServers: kafka-pre.acme.com:9093
